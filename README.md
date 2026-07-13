@@ -72,7 +72,7 @@ This trains the Linear Regression model (+ Decision Tree and Random Forest for c
 python app.py
 ```
 
-The API server starts at `http://localhost:5000`.
+The API server starts at `http://localhost:5001`.
 
 ### 4. Start the React Frontend
 
