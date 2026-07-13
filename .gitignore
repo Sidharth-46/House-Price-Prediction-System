@@ -30,3 +30,11 @@ mlruns/
 # IDEs
 .vscode/
 .idea/
+
+# Node.js (React frontend)
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Trained model artifacts (generated — regenerate with `python src/evaluate.py`)
+models/
