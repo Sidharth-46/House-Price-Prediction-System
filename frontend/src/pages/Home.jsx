@@ -18,9 +18,9 @@ export default function Home() {
           </h1>
 
           <p className="hero-subtitle">
-            Get accurate property price estimates using machine learning.
-            Enter your property details and receive an instant prediction
-            powered by Multiple Linear Regression trained on real market data.
+            MLOps Project by:<br></br>
+            Sidharth M K - 24IT0156<br></br>
+            Sarvesh R    - 24IT0145
           </p>
 
           <div className="hero-actions">

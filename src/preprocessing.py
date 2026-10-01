@@ -102,7 +102,7 @@ def preprocess_data(df, save_artifacts=True):
 
     # Identify column types
     num_cols = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
-    cat_cols = X.select_dtypes(include=["object", "string", "str"]).columns.tolist()
+    cat_cols = X.select_dtypes(include=["object", "string"]).columns.tolist()
     
     # Explicitly reorder columns to ensure consistency
     X = X[num_cols + cat_cols]

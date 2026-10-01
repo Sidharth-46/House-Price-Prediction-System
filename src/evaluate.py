@@ -13,6 +13,8 @@ from sklearn.model_selection import cross_val_score, KFold
 import os
 import sys
 import json
+import mlflow
+import mlflow.sklearn
 
 # Add src to path to import sibling modules
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -183,11 +185,22 @@ def main():
     
     results = []
     
+    mlflow.set_tracking_uri("http://localhost:5000")
+    mlflow.set_experiment("India_House_Price_Prediction")
+    mlflow.sklearn.autolog()
+
     for name, train_func in models_to_train:
         print(f"🏋️  Training {name}...")
-        model = train_func(X_train, y_train_model)
-        res = evaluate_model(model, X_train, y_train_model, X_test, y_test, name, apply_log)
-        results.append(res)
+        with mlflow.start_run(run_name=name):
+            model = train_func(X_train, y_train_model)
+            res = evaluate_model(model, X_train, y_train_model, X_test, y_test, name, apply_log)
+            
+            mlflow.log_metric("custom_rmse", res["rmse"])
+            mlflow.log_metric("custom_mae", res["mae"])
+            mlflow.log_metric("custom_r2", res["r2"])
+            mlflow.log_metric("cv_r2", res["cv_r2"])
+            
+            results.append(res)
         
     best_result = min(results, key=lambda x: (x['rmse'], x['mae'], -x['r2']))
     best_model_name = best_result['model_name']
