@@ -33,7 +33,7 @@ export default function Dashboard() {
   if (!metrics) {
     return (
       <div className="loading-screen">
-        <p>⚠️ Could not load metrics. Make sure the Flask backend is running on port 5000.</p>
+        <p>⚠️ Could not load metrics. Please verify the API connection.</p>
       </div>
     )
   }
