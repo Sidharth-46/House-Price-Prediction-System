@@ -55,7 +55,13 @@ def load_artifacts():
     metadata_path = MODELS_DIR / "feature_metadata.json"
     metrics_path = MODELS_DIR / "metrics.json"
 
-    logger.info(f"Attempting to load model from: {model_path}")
+    logger.info(f"MODEL PATH: {model_path}")
+    logger.info(f"MODEL EXISTS: {model_path.exists()}")
+    
+    if model_path.exists():
+        logger.info(f"MODEL SIZE: {model_path.stat().st_size}")
+    else:
+        logger.info("MODEL SIZE: 0")
 
     if not model_path.exists():
         logger.error(f"⚠️ Model not found at {model_path}. Please check if it was committed and deployed.")
@@ -64,9 +70,12 @@ def load_artifacts():
     try:
         model = joblib.load(model_path)
         preprocessor = joblib.load(preprocessor_path)
-        logger.info("Model and preprocessor loaded successfully.")
+        logger.info("MODEL LOAD: SUCCESS")
     except Exception as e:
-        logger.error(f"Failed to load model or preprocessor: {e}")
+        import traceback
+        logger.error("MODEL LOAD: FAILED")
+        logger.error(f"MODEL LOAD ERROR: {type(e).__name__}: {str(e)}")
+        logger.error(traceback.format_exc())
         return False
 
     try:
