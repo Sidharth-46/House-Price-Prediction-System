@@ -37,4 +37,9 @@ frontend/dist/
 frontend/.vite/
 
 # Trained model artifacts (generated — regenerate with `python src/evaluate.py`)
-models/
+models/*
+
+!models/primary_model.joblib
+!models/preprocessor.joblib
+!models/feature_metadata.json
+!models/metrics.json

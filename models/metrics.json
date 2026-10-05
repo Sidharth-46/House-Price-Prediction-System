@@ -1,0 +1,73 @@
+{
+  "primary_model": "Random Forest (Tuned)",
+  "training_samples": 106916,
+  "test_samples": 26729,
+  "num_features": 97,
+  "target_log_transformed": false,
+  "results": [
+    {
+      "mae": 21.0519,
+      "mse": 756.0151,
+      "rmse": 27.4957,
+      "r2": 0.9551,
+      "cv_r2": 0.9558,
+      "model": "Linear Regression"
+    },
+    {
+      "mae": 21.0518,
+      "mse": 756.0155,
+      "rmse": 27.4957,
+      "r2": 0.9551,
+      "cv_r2": 0.9558,
+      "model": "Ridge Regression"
+    },
+    {
+      "mae": 21.0321,
+      "mse": 755.7868,
+      "rmse": 27.4916,
+      "r2": 0.9551,
+      "cv_r2": 0.9559,
+      "model": "Lasso Regression"
+    },
+    {
+      "mae": 21.33,
+      "mse": 825.9565,
+      "rmse": 28.7395,
+      "r2": 0.951,
+      "cv_r2": 0.9518,
+      "model": "ElasticNet"
+    },
+    {
+      "mae": 14.4419,
+      "mse": 414.3753,
+      "rmse": 20.3562,
+      "r2": 0.9754,
+      "cv_r2": 0.9759,
+      "model": "Decision Tree"
+    },
+    {
+      "mae": 10.5284,
+      "mse": 217.4636,
+      "rmse": 14.7466,
+      "r2": 0.9871,
+      "cv_r2": 0.9874,
+      "model": "Random Forest (Tuned)"
+    },
+    {
+      "mae": 11.8745,
+      "mse": 263.1975,
+      "rmse": 16.2234,
+      "r2": 0.9844,
+      "cv_r2": 0.9848,
+      "model": "Gradient Boosting (Tuned)"
+    },
+    {
+      "mae": 11.8641,
+      "mse": 262.9969,
+      "rmse": 16.2172,
+      "r2": 0.9844,
+      "cv_r2": 0.9848,
+      "model": "XGBoost (Tuned)"
+    }
+  ]
+}

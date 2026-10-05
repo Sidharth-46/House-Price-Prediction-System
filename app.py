@@ -17,6 +17,13 @@ import pandas as pd
 import json
 import os
 import sys
+from pathlib import Path
+import logging
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Add src to path
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
@@ -26,8 +33,9 @@ from preprocessing import KNOWN_AMENITIES, engineer_amenities, DROP_COLS, TARGET
 app = Flask(__name__)
 CORS(app)  # Allow React frontend (different port) to make requests
 
-MODELS_DIR = os.path.join(os.path.dirname(__file__), "models")
-DATASET_PATH = os.path.join(os.path.dirname(__file__), "dataset", "india_housing_prices.csv")
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_DIR = BASE_DIR / "models"
+DATASET_PATH = BASE_DIR / "dataset" / "india_housing_prices.csv"
 
 # ── Load model artifacts once at startup ───────────────────────────────────────
 model = None
@@ -42,31 +50,48 @@ def load_artifacts():
     """Load model, preprocessor, metadata, and metrics from disk."""
     global model, preprocessor, feature_metadata, dataset_options, best_model_name, target_log_transformed
 
-    model_path = os.path.join(MODELS_DIR, "primary_model.joblib")
-    preprocessor_path = os.path.join(MODELS_DIR, "preprocessor.joblib")
-    metadata_path = os.path.join(MODELS_DIR, "feature_metadata.json")
-    metrics_path = os.path.join(MODELS_DIR, "metrics.json")
+    model_path = MODELS_DIR / "primary_model.joblib"
+    preprocessor_path = MODELS_DIR / "preprocessor.joblib"
+    metadata_path = MODELS_DIR / "feature_metadata.json"
+    metrics_path = MODELS_DIR / "metrics.json"
 
-    if not os.path.exists(model_path):
-        print("⚠️  Model not found. Run `python src/evaluate.py` first.")
+    logger.info(f"Attempting to load model from: {model_path}")
+
+    if not model_path.exists():
+        logger.error(f"⚠️ Model not found at {model_path}. Please check if it was committed and deployed.")
         return False
 
-    model = joblib.load(model_path)
-    preprocessor = joblib.load(preprocessor_path)
+    try:
+        model = joblib.load(model_path)
+        preprocessor = joblib.load(preprocessor_path)
+        logger.info("Model and preprocessor loaded successfully.")
+    except Exception as e:
+        logger.error(f"Failed to load model or preprocessor: {e}")
+        return False
 
-    with open(metadata_path, "r") as f:
-        feature_metadata = json.load(f)
+    try:
+        with open(metadata_path, "r") as f:
+            feature_metadata = json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to load feature metadata: {e}")
+        return False
         
-    if os.path.exists(metrics_path):
-        with open(metrics_path, "r") as f:
-            metrics_data = json.load(f)
-            best_model_name = metrics_data.get("primary_model", "Unknown Model")
-            target_log_transformed = metrics_data.get("target_log_transformed", False)
+    if metrics_path.exists():
+        try:
+            with open(metrics_path, "r") as f:
+                metrics_data = json.load(f)
+                best_model_name = metrics_data.get("primary_model", "Unknown Model")
+                target_log_transformed = metrics_data.get("target_log_transformed", False)
+        except Exception as e:
+            logger.error(f"Failed to load metrics: {e}")
 
-    # Extract unique values from the dataset for form dropdowns
-    dataset_options = _extract_feature_options()
+    try:
+        # Extract unique values from the dataset for form dropdowns
+        dataset_options = _extract_feature_options()
+    except Exception as e:
+        logger.error(f"Failed to load dataset options: {e}")
 
-    print(f"✅ Model ({best_model_name}) and preprocessor loaded successfully.")
+    logger.info(f"✅ Model ({best_model_name}) initialized and ready.")
     return True
 
 
@@ -115,8 +140,8 @@ def health_check():
 @app.route("/api/metrics", methods=["GET"])
 def get_metrics():
     """Return model performance metrics (R², MAE, MSE, RMSE)."""
-    metrics_path = os.path.join(MODELS_DIR, "metrics.json")
-    if not os.path.exists(metrics_path):
+    metrics_path = MODELS_DIR / "metrics.json"
+    if not metrics_path.exists():
         return jsonify({"error": "Metrics not found. Train the model first."}), 404
 
     with open(metrics_path, "r") as f:
@@ -274,6 +299,8 @@ def internal_error(e):
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
+# Load artifacts when the module is imported by a WSGI server like Gunicorn
+load_artifacts()
+
 if __name__ == "__main__":
-    load_artifacts()
     app.run(debug=True, host="0.0.0.0", port=5001)
